@@ -1,13 +1,13 @@
 import "./Square.css";
 
 export default function Square({ value, onSquareClick }) {
-    function handleContextMenu() {
+    function handleContextMenu(event) {
         event.preventDefault();
-        onSquareClick();
+        onSquareClick("right");
     }
 
     return (
-        <button className="square" onClick={onSquareClick} onContextMenu={handleContextMenu}>
+        <button className="square" onClick={() => onSquareClick("left")} onContextMenu={handleContextMenu}>
             <h3>{value}</h3>
         </button>
     );
