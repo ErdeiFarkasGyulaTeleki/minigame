@@ -7,9 +7,13 @@ const PLAYER_X = "x";
 const PLAYER_O = "o";
 
 export default function Board() {
-    const [status, setStatus] = useState(["", "", ""]);
+    const [status, setStatus] = useState([
+        ["", "", ""],
+        ["", "", ""],
+        ["", "", ""],
+    ]);
 
-    function handleClick(idx, mouseButton) {
+    function handleClick(rowId, colId, mouseButton) {
         let newValue;
 
         if (mouseButton === LEFT) {
@@ -20,7 +24,9 @@ export default function Board() {
             return;
         }
 
-        const newStatus = status.map((value, index) => (index === idx ? newValue : value));
+        const newStatus = status.map((row, index) =>
+            index === rowId ? row.map((value, colIndex) => (colIndex === colId ? newValue : value)) : row,
+        );
         setStatus(newStatus);
     }
 
@@ -28,12 +34,16 @@ export default function Board() {
         <div className="board">
             <h1>Board</h1>
             <div>
-                {status.map((element, index) => (
-                    <Square
-                        key={index}
-                        value={element}
-                        onSquareClick={(mouseButton) => handleClick(index, mouseButton)}
-                    />
+                {status.map((row, rIndex) => (
+                    <div key={rIndex} className="board-row">
+                        {row.map((element, index) => (
+                            <Square
+                                key={index}
+                                value={element}
+                                onSquareClick={(mouseButton) => handleClick(rIndex, index, mouseButton)}
+                            />
+                        ))}
+                    </div>
                 ))}
             </div>
         </div>
