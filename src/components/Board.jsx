@@ -6,21 +6,34 @@ import { PLAYER_X, PLAYER_O } from "./Square.jsx";
 export default function Board() {
     const BOARD_SIZE = 3;
 
-    const [status, setStatus] = useState([
-        ["", "", ""],
-        ["", "", ""],
-        ["", "", ""],
-    ]);
+    function createBoard() {
+        let board = [];
+
+        for (let i = 0; i < BOARD_SIZE; i++) {
+            let row = [];
+            for (let j = 0; j < BOARD_SIZE; j++) {
+                row.push("");
+            }
+            board.push(row);
+        }
+
+        return board;
+    }
+
+    const [status, setStatus] = useState(createBoard());
+    const [winner, setWinner] = useState();
 
     let lastPlayer = useRef();
 
-    function checkForWin(x, y) {
+    function checkForWin(newStatus, y, x) {
+        let status = newStatus;
+
+        console.log(`X: ${x}`);
+        console.log(`Y: ${y}`);
+
         let symbol = status[x][y];
 
-        let matchesX = 0;
-        let matchesY = 0;
-        let matchesDiagLeft = 0;
-        let matchesDiagRight = 0;
+        console.log(`Symbol: ${symbol}`);
 
         // Tracks matches based on index, where:
         // 0: on the X axis (horizontal)
@@ -63,9 +76,10 @@ export default function Board() {
     }
 
     function handleClick(rowId, colId, player) {
-        if (player !== PLAYER_O && player !== PLAYER_X) return;
         if (lastPlayer.player === player) return;
         if (status[rowId][colId] !== "") return;
+        if (player !== PLAYER_O && player !== PLAYER_X) return;
+        if (winner) return;
 
         lastPlayer.player = player;
 
@@ -74,6 +88,11 @@ export default function Board() {
         );
 
         setStatus(newStatus);
+
+        if (checkForWin(newStatus, colId, rowId)) {
+            console.log("WIN");
+            setWinner(true);
+        }
     }
 
     return (
