@@ -1,6 +1,6 @@
 import Square from "./Square.jsx";
 
-import { useState, useRef } from "react";
+import { useState, useRef, use } from "react";
 import { PLAYER_X, PLAYER_O } from "./Square.jsx";
 
 export default function Board() {
@@ -22,6 +22,7 @@ export default function Board() {
 
     const [status, setStatus] = useState(createBoard());
     const [winner, setWinner] = useState();
+    const [lastCell, setLastCell] = useState();
 
     let lastPlayer = useRef();
 
@@ -89,6 +90,9 @@ export default function Board() {
 
         setStatus(newStatus);
 
+        setLastCell([rowId, colId]);
+        console.log(lastCell);
+
         if (checkForWin(newStatus, colId, rowId)) {
             console.log("WIN");
             setWinner(true);
@@ -97,6 +101,7 @@ export default function Board() {
 
     function handlePlayAgain() {
         setStatus(createBoard());
+        setLastCell(undefined);
         setWinner(undefined);
 
         lastPlayer.player = undefined;
@@ -108,11 +113,12 @@ export default function Board() {
             <div>
                 {status.map((row, rIndex) => (
                     <div key={rIndex} className="board-row">
-                        {row.map((element, index) => (
+                        {row.map((element, cIndex) => (
                             <Square
-                                key={index}
+                                key={cIndex}
                                 value={element}
-                                onSquareClick={(mouseButton) => handleClick(rIndex, index, mouseButton)}
+                                highlight={lastCell?.[0] === rIndex && lastCell?.[1] === cIndex}
+                                onSquareClick={(mouseButton) => handleClick(rIndex, cIndex, mouseButton)}
                             />
                         ))}
                     </div>
