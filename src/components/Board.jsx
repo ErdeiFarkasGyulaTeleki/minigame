@@ -22,11 +22,12 @@ export default function Board() {
 
     const [status, setStatus] = useState(createBoard());
     const [winner, setWinner] = useState();
+    const [gameOver, setGameOver] = useState(false);
     const [lastCell, setLastCell] = useState();
 
     let lastPlayer = useRef();
 
-    function checkForWin(newStatus, y, x) {
+    function isWin(newStatus, y, x) {
         let status = newStatus;
 
         console.log(`X: ${x}`);
@@ -76,6 +77,10 @@ export default function Board() {
         return false;
     }
 
+    function isGameOver() {
+        return status.some((v) => v);
+    }
+
     function handleClick(rowId, colId, player) {
         if (lastPlayer.player === player) return;
         if (status[rowId][colId] !== "") return;
@@ -93,9 +98,9 @@ export default function Board() {
         setLastCell([rowId, colId]);
         console.log(lastCell);
 
-        if (checkForWin(newStatus, colId, rowId)) {
+        if (isWin(newStatus, colId, rowId)) {
             console.log("WIN");
-            setWinner(true);
+            setWinner(player);
         }
     }
 
@@ -103,6 +108,7 @@ export default function Board() {
         setStatus(createBoard());
         setLastCell(undefined);
         setWinner(undefined);
+        setGameOver(false);
 
         lastPlayer.player = undefined;
     }
@@ -124,7 +130,7 @@ export default function Board() {
                     </div>
                 ))}
             </div>
-            {winner && <div>`Game over! {winner} won`</div>}
+            {winner && <div>Game over! {winner} won</div>}
             {winner && <button onClick={handlePlayAgain}>Reset</button>}
         </div>
     );
