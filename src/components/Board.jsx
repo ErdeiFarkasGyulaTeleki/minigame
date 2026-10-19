@@ -95,6 +95,13 @@ export default function Board() {
         }
     }
 
+    function handlePlayAgain() {
+        setStatus(createBoard());
+        setWinner(undefined);
+
+        lastPlayer.player = undefined;
+    }
+
     return (
         <div className="board">
             <h1>Board</h1>
@@ -111,6 +118,8 @@ export default function Board() {
                     </div>
                 ))}
             </div>
+            {winner && <div>`Game over! {winner} won`</div>}
+            {winner && <button onClick={handlePlayAgain}>Reset</button>}
         </div>
     );
 }
