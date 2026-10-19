@@ -1,32 +1,78 @@
-import { useState } from "react";
 import Square from "./Square.jsx";
 
-const LEFT = "left";
-const RIGHT = "right";
-const PLAYER_X = "x";
-const PLAYER_O = "o";
+import { useState, useRef } from "react";
+import { PLAYER_X, PLAYER_O } from "./Square.jsx";
 
 export default function Board() {
+    const BOARD_SIZE = 3;
+
     const [status, setStatus] = useState([
         ["", "", ""],
         ["", "", ""],
         ["", "", ""],
     ]);
 
-    function handleClick(rowId, colId, mouseButton) {
-        let newValue;
+    let lastPlayer = useRef();
 
-        if (mouseButton === LEFT) {
-            newValue = PLAYER_X;
-        } else if (mouseButton === RIGHT) {
-            newValue = PLAYER_O;
-        } else {
-            return;
+    function checkForWin(x, y) {
+        let symbol = status[x][y];
+
+        let matchesX = 0;
+        let matchesY = 0;
+        let matchesDiagLeft = 0;
+        let matchesDiagRight = 0;
+
+        // Tracks matches based on index, where:
+        // 0: on the X axis (horizontal)
+        // 1: on the Y axis (vertical)
+        // 2: diagonal 1
+        // 3: diagonal 2
+        let matches = [0, 0, 0, 0];
+
+        function hasEnoughMatches() {
+            return matches.includes(BOARD_SIZE);
         }
 
+        for (let i = 0; i < BOARD_SIZE; i++) {
+            if (status[i][y] === symbol) {
+                matches[0]++;
+            }
+
+            if (hasEnoughMatches()) return true;
+
+            if (status[x][i] === symbol) {
+                matches[1]++;
+            }
+
+            if (hasEnoughMatches()) return true;
+
+            if (status[i][i] === symbol) {
+                matches[2]++;
+            }
+
+            if (hasEnoughMatches()) return true;
+
+            if (status[BOARD_SIZE - i - 1][i] === symbol) {
+                matches[3]++;
+            }
+
+            if (hasEnoughMatches()) return true;
+        }
+
+        return false;
+    }
+
+    function handleClick(rowId, colId, player) {
+        if (player !== PLAYER_O && player !== PLAYER_X) return;
+        if (lastPlayer.player === player) return;
+        if (status[rowId][colId] !== "") return;
+
+        lastPlayer.player = player;
+
         const newStatus = status.map((row, index) =>
-            index === rowId ? row.map((value, colIndex) => (colIndex === colId ? newValue : value)) : row,
+            index === rowId ? row.map((value, colIndex) => (colIndex === colId ? player : value)) : row,
         );
+
         setStatus(newStatus);
     }
 
