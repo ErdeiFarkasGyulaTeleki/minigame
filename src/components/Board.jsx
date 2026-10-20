@@ -142,8 +142,8 @@ export default function Board() {
             </div>
             {winner && <div>Game over! {winner} won</div>}
             {winner && <button onClick={handlePlayAgain}>Reset</button>}
-            {winner && <div>Draw!</div>}
-            {winner && <button onClick={handlePlayAgain}>Reset</button>}
+            {draw && <div>Draw!</div>}
+            {draw && <button onClick={handlePlayAgain}>Reset</button>}
         </div>
     );
 }
