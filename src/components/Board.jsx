@@ -25,7 +25,10 @@ export default function Board() {
     const [winner, setWinner] = useState();
     const [lastCell, setLastCell] = useState();
     const [draw, setDraw] = useState(false);
-    const [wins, setWins] = useState({ X: 0, O: 0 });
+    const [wins, setWins] = useState(() => {
+        const storedWins = localStorage.getItem("wins");
+        return storedWins ? JSON.parse(storedWins) : { X: 0, O: 0 };
+    });
 
     let lastPlayer = useRef();
 
@@ -108,6 +111,8 @@ export default function Board() {
         if (isWin(newStatus, colId, rowId)) {
             setWinner(player);
             setWins((prev) => ({ ...prev, [player]: prev[player] + 1 }));
+
+            localStorage.setItem("wins", JSON.stringify({ ...wins, [player]: wins[player] + 1 }));
         }
 
         if (isDraw(newStatus)) {
