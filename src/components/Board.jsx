@@ -4,10 +4,10 @@ import { useState, useRef, use } from "react";
 import { PLAYER_X, PLAYER_O } from "./Square.jsx";
 
 export default function Board() {
-    const BOARD_SIZE = 3;
+    const BOARD_SIZE = 5;
     const BOARD_SQUARED = BOARD_SIZE * BOARD_SIZE;
 
-    const REQ_TO_WIN = BOARD_SIZE;
+    const REQ_TO_WIN = 3;
 
     function createBoard() {
         let board = [];
@@ -47,33 +47,38 @@ export default function Board() {
         let matches = [0, 0, 0, 0];
 
         function hasEnoughMatches() {
-            return matches.includes(REQ_TO_WIN);
+            console.log(matches);
+            return matches.some((match) => match >= REQ_TO_WIN);
         }
 
         for (let i = 0; i < BOARD_SIZE; i++) {
-            if (status[i][y] === symbol) {
-                matches[0]++;
-            }
-
-            if (hasEnoughMatches()) return true;
-
             if (status[x][i] === symbol) {
-                matches[1]++;
+                matches[0]++;
+                if (hasEnoughMatches()) return true;
+            } else {
+                matches[0] = 0;
             }
 
-            if (hasEnoughMatches()) return true;
+            if (status[i][y] === symbol) {
+                matches[1]++;
+                if (hasEnoughMatches()) return true;
+            } else {
+                matches[1] = 0;
+            }
 
             if (status[i][i] === symbol) {
                 matches[2]++;
+                if (hasEnoughMatches()) return true;
+            } else {
+                matches[2] = 0;
             }
-
-            if (hasEnoughMatches()) return true;
 
             if (status[BOARD_SIZE - i - 1][i] === symbol) {
                 matches[3]++;
+                if (hasEnoughMatches()) return true;
+            } else {
+                matches[3] = 0;
             }
-
-            if (hasEnoughMatches()) return true;
         }
 
         return false;
