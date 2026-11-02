@@ -25,6 +25,7 @@ export default function Board() {
     const [winner, setWinner] = useState();
     const [lastCell, setLastCell] = useState();
     const [draw, setDraw] = useState(false);
+    const [wins, setWins] = useState({ X: 0, O: 0 });
 
     let lastPlayer = useRef();
 
@@ -106,6 +107,7 @@ export default function Board() {
 
         if (isWin(newStatus, colId, rowId)) {
             setWinner(player);
+            setWins((prev) => ({ ...prev, [player]: prev[player] + 1 }));
         }
 
         if (isDraw(newStatus)) {
@@ -141,8 +143,12 @@ export default function Board() {
                 ))}
             </div>
             {!(draw || winner) && <div>{lastPlayer.player == "X" ? "O" : "X"}'s turn</div>}
+
             {winner && <div>Game over! {winner} won</div>}
             {draw && <div>Draw!</div>}
+
+            {wins.X > 0 && <div>X has won {wins.X} games</div>}
+            {wins.O > 0 && <div>O has won {wins.O} games</div>}
 
             {(draw || winner) && <button onClick={handlePlayAgain}>Reset</button>}
         </div>
