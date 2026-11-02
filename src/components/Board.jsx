@@ -7,6 +7,8 @@ export default function Board() {
     const BOARD_SIZE = 3;
     const BOARD_SQUARED = BOARD_SIZE * BOARD_SIZE;
 
+    const REQ_TO_WIN = BOARD_SIZE;
+
     function createBoard() {
         let board = [];
 
@@ -45,7 +47,7 @@ export default function Board() {
         let matches = [0, 0, 0, 0];
 
         function hasEnoughMatches() {
-            return matches.includes(BOARD_SIZE);
+            return matches.includes(REQ_TO_WIN);
         }
 
         for (let i = 0; i < BOARD_SIZE; i++) {
