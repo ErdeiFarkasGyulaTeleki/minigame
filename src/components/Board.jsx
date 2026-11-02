@@ -140,6 +140,7 @@ export default function Board() {
                     </div>
                 ))}
             </div>
+            {!(draw || winner) && <div>{lastPlayer.player == "X" ? "O" : "X"}'s turn</div>}
             {winner && <div>Game over! {winner} won</div>}
             {draw && <div>Draw!</div>}
 
