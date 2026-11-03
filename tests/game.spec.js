@@ -52,3 +52,19 @@ test('X wins', async ({ page }) => {
 
   await expect(page.getByText('Game over! X won')).toBeVisible();
 });
+
+test('draw', async ({ page }) => {
+  const squares = page.locator('.square');
+
+  await squares.nth(0).click();
+  await squares.nth(1).click({ button: 'right' });
+  await squares.nth(2).click();
+  await squares.nth(4).click({ button: 'right' });
+  await squares.nth(3).click();
+  await squares.nth(5).click({ button: 'right' });
+  await squares.nth(7).click();
+  await squares.nth(6).click({ button: 'right' });
+  await squares.nth(8).click();
+
+  await expect(page.getByText('Draw!')).toBeVisible();
+});

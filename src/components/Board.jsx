@@ -67,6 +67,18 @@ export default function Board() {
         });
     }
 
+    function getPlacedSymbolsFromBoard(newStatus) {
+        let number = 0;
+
+        newStatus.forEach((row) => {
+            row.forEach((place) => {
+                if (place == "X" || place == "O") number++;
+            });
+        });
+
+        return number;
+    }
+
     function isDraw(newStatus) {
         return getPlacedSymbolsFromBoard(newStatus) === BOARD_SQUARED;
     }
