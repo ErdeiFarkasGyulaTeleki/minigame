@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { PLAYER_X, PLAYER_O } from "./Square.jsx";
 
 export default function Board() {
-    const BOARD_SIZE = 5;
+    const BOARD_SIZE = 3;
     const BOARD_SQUARED = BOARD_SIZE * BOARD_SIZE;
 
     const REQ_TO_WIN = 3;
@@ -25,7 +25,6 @@ export default function Board() {
 
     const [status, setStatus] = useState(createBoard());
     const [winner, setWinner] = useState();
-    const [gameOver, setGameOver] = useState(false);
     const [lastCell, setLastCell] = useState();
     const [draw, setDraw] = useState(false);
     const [wins, setWins] = useState(() => {
@@ -68,8 +67,20 @@ export default function Board() {
         });
     }
 
-    function isGameOver() {
-        return status.some((v) => v);
+    function getPlacedSymbolsFromBoard(newStatus) {
+        let number = 0;
+
+        newStatus.forEach((row) => {
+            row.forEach((place) => {
+                if (place == "X" || place == "O") number++;
+            });
+        });
+
+        return number;
+    }
+
+    function isDraw(newStatus) {
+        return getPlacedSymbolsFromBoard(newStatus) === BOARD_SQUARED;
     }
 
     function handleClick(rowId, colId, player) {
@@ -106,7 +117,6 @@ export default function Board() {
         setStatus(createBoard());
         setLastCell(undefined);
         setWinner(undefined);
-        setGameOver(false);
 
         lastPlayer.player = undefined;
     }
