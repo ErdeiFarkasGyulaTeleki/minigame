@@ -1,10 +1,13 @@
 import Square from "./Square.jsx";
 
-import { useState, useRef, use } from "react";
+import { useState, useRef } from "react";
 import { PLAYER_X, PLAYER_O } from "./Square.jsx";
 
 export default function Board() {
-    const BOARD_SIZE = 3;
+    const BOARD_SIZE = 5;
+    const BOARD_SQUARED = BOARD_SIZE * BOARD_SIZE;
+
+    const REQ_TO_WIN = 3;
 
     function createBoard() {
         let board = [];
@@ -24,57 +27,45 @@ export default function Board() {
     const [winner, setWinner] = useState();
     const [gameOver, setGameOver] = useState(false);
     const [lastCell, setLastCell] = useState();
+    const [draw, setDraw] = useState(false);
+    const [wins, setWins] = useState(() => {
+        const storedWins = localStorage.getItem("wins");
+        return storedWins ? JSON.parse(storedWins) : { X: 0, O: 0 };
+    });
 
     let lastPlayer = useRef();
 
-    function isWin(newStatus, y, x) {
-        let status = newStatus;
+    function isWin(board, row, col) {
+        const symbol = board[row][col];
+        const directions = [
+            [0, 1],
+            [1, 0],
+            [1, 1],
+            [1, -1],
+        ];
 
-        console.log(`X: ${x}`);
-        console.log(`Y: ${y}`);
+        return directions.some(([rowStep, colStep]) => {
+            let matches = 1;
 
-        let symbol = status[x][y];
+            for (const direction of [-1, 1]) {
+                let currentRow = row + rowStep * direction;
+                let currentCol = col + colStep * direction;
 
-        console.log(`Symbol: ${symbol}`);
-
-        // Tracks matches based on index, where:
-        // 0: on the X axis (horizontal)
-        // 1: on the Y axis (vertical)
-        // 2: diagonal 1
-        // 3: diagonal 2
-        let matches = [0, 0, 0, 0];
-
-        function hasEnoughMatches() {
-            return matches.includes(BOARD_SIZE);
-        }
-
-        for (let i = 0; i < BOARD_SIZE; i++) {
-            if (status[i][y] === symbol) {
-                matches[0]++;
+                while (
+                    currentRow >= 0 &&
+                    currentRow < BOARD_SIZE &&
+                    currentCol >= 0 &&
+                    currentCol < BOARD_SIZE &&
+                    board[currentRow][currentCol] === symbol
+                ) {
+                    matches++;
+                    currentRow += rowStep * direction;
+                    currentCol += colStep * direction;
+                }
             }
 
-            if (hasEnoughMatches()) return true;
-
-            if (status[x][i] === symbol) {
-                matches[1]++;
-            }
-
-            if (hasEnoughMatches()) return true;
-
-            if (status[i][i] === symbol) {
-                matches[2]++;
-            }
-
-            if (hasEnoughMatches()) return true;
-
-            if (status[BOARD_SIZE - i - 1][i] === symbol) {
-                matches[3]++;
-            }
-
-            if (hasEnoughMatches()) return true;
-        }
-
-        return false;
+            return matches >= REQ_TO_WIN;
+        });
     }
 
     function isGameOver() {
@@ -98,9 +89,16 @@ export default function Board() {
         setLastCell([rowId, colId]);
         console.log(lastCell);
 
-        if (isWin(newStatus, colId, rowId)) {
-            console.log("WIN");
+        if (isWin(newStatus, rowId, colId)) {
             setWinner(player);
+            setWins((prev) => ({ ...prev, [player]: prev[player] + 1 }));
+
+            localStorage.setItem("wins", JSON.stringify({ ...wins, [player]: wins[player] + 1 }));
+        }
+
+        if (isDraw(newStatus)) {
+            setDraw(true);
+            console.log("Draw!");
         }
     }
 
@@ -130,8 +128,15 @@ export default function Board() {
                     </div>
                 ))}
             </div>
+            {!(draw || winner) && <div>{lastPlayer.player == "X" ? "O" : "X"}'s turn</div>}
+
             {winner && <div>Game over! {winner} won</div>}
-            {winner && <button onClick={handlePlayAgain}>Reset</button>}
+            {draw && <div>Draw!</div>}
+
+            {wins.X > 0 && <div>X has won {wins.X} games</div>}
+            {wins.O > 0 && <div>O has won {wins.O} games</div>}
+
+            {(draw || winner) && <button onClick={handlePlayAgain}>Reset</button>}
         </div>
     );
 }
