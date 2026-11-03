@@ -1,6 +1,6 @@
 import Square from "./Square.jsx";
 
-import { useState, useRef, use } from "react";
+import { useState, useRef } from "react";
 import { PLAYER_X, PLAYER_O } from "./Square.jsx";
 
 export default function Board() {
@@ -34,54 +34,37 @@ export default function Board() {
 
     let lastPlayer = useRef();
 
-    function isWin(newStatus, y, x) {
-        let status = newStatus;
+    function isWin(board, row, col) {
+        const symbol = board[row][col];
+        const directions = [
+            [0, 1],
+            [1, 0],
+            [1, 1],
+            [1, -1],
+        ];
 
-        let symbol = status[x][y];
+        return directions.some(([rowStep, colStep]) => {
+            let matches = 1;
 
-        // Tracks matches based on index, where:
-        // 0: on the X axis (horizontal)
-        // 1: on the Y axis (vertical)
-        // 2: diagonal 1
-        // 3: diagonal 2
-        let matches = [0, 0, 0, 0];
+            for (const direction of [-1, 1]) {
+                let currentRow = row + rowStep * direction;
+                let currentCol = col + colStep * direction;
 
-        function hasEnoughMatches() {
-            console.log(matches);
-            return matches.some((match) => match >= REQ_TO_WIN);
-        }
-
-        for (let i = 0; i < BOARD_SIZE; i++) {
-            if (status[x][i] === symbol) {
-                matches[0]++;
-                if (hasEnoughMatches()) return true;
-            } else {
-                matches[0] = 0;
+                while (
+                    currentRow >= 0 &&
+                    currentRow < BOARD_SIZE &&
+                    currentCol >= 0 &&
+                    currentCol < BOARD_SIZE &&
+                    board[currentRow][currentCol] === symbol
+                ) {
+                    matches++;
+                    currentRow += rowStep * direction;
+                    currentCol += colStep * direction;
+                }
             }
 
-            if (status[i][y] === symbol) {
-                matches[1]++;
-                if (hasEnoughMatches()) return true;
-            } else {
-                matches[1] = 0;
-            }
-
-            if (status[i][i] === symbol) {
-                matches[2]++;
-                if (hasEnoughMatches()) return true;
-            } else {
-                matches[2] = 0;
-            }
-
-            if (status[BOARD_SIZE - i - 1][i] === symbol) {
-                matches[3]++;
-                if (hasEnoughMatches()) return true;
-            } else {
-                matches[3] = 0;
-            }
-        }
-
-        return false;
+            return matches >= REQ_TO_WIN;
+        });
     }
 
     function getPlacedSymbolsFromBoard(newStatus) {
@@ -115,7 +98,7 @@ export default function Board() {
         setStatus(newStatus);
         setLastCell([rowId, colId]);
 
-        if (isWin(newStatus, colId, rowId)) {
+        if (isWin(newStatus, rowId, colId)) {
             setWinner(player);
             setWins((prev) => ({ ...prev, [player]: prev[player] + 1 }));
 
